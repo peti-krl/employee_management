@@ -9,6 +9,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 public class EmpController {
@@ -33,9 +34,50 @@ public class EmpController {
         return this.empRepository.findAll();
     }
 
+    // Return employees with the project id
+    @GetMapping("/employees/{id}")
+    public List<EmpProjects> findByProjectId(@PathVariable("id") int id){
+        Iterable<EmpProjects> empProjects = this.empRepository.findAll();
+        List<EmpProjects> empProjectsList = new ArrayList<>();
+        for (EmpProjects item : empProjects){
+            if (item.getProjectID() == id){
+                empProjectsList.add(item);
+            }
+        }
+        return empProjectsList;
+    }
+
+    // Delete employee by id
+    @DeleteMapping("/deleteemployee/{id}")
+    public void deleteEmployeeById(@PathVariable("id") int id){
+        Iterable<EmpProjects> empProjects = this.empRepository.findAll();
+        for (EmpProjects item : empProjects){
+            if (item.getEmpID() == id){
+                this.empRepository.delete(item);
+            }
+            break;
+        }
+    }
+
     // Add record
     @PostMapping("/project")
     public EmpProjects addEmployee(@RequestBody EmpProjects empProjects){
         return this.empRepository.save(empProjects);
     }
+
+    // Update employee by id
+    @PostMapping("/updateemployee")
+    public EmpProjects updateEmployeeById(@RequestBody EmpProjects newEmpProjects){
+        Iterable<EmpProjects> empProjects = this.empRepository.findAll();
+        for(EmpProjects item: empProjects){
+            if(newEmpProjects.getEmpID() == item.getEmpID() && newEmpProjects.getProjectID() == item.getProjectID())
+            {
+                item.setDateFrom(newEmpProjects.getDateFrom());
+                item.setDateTo(newEmpProjects.getDateTo());
+                return this.empRepository.save(item);
+            }
+        }
+        return null;
+    }
+
 }
