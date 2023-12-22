@@ -41,10 +41,6 @@ public class ReaderCSV implements IReader{
                 }else {
                     dateTo = LocalDate.parse(csvRecord.get(3));
                 }
-                System.out.println(empId);
-                System.out.println(projectId);
-                System.out.println(dateFrom);
-                System.out.println(dateTo);
 
                 EmpProjects project = new EmpProjects(empId, projectId, dateFrom, dateTo);
                 projects.add(project);
@@ -55,7 +51,6 @@ public class ReaderCSV implements IReader{
             return arr;
 
         } catch (Exception e) {
-            e.printStackTrace();
             return new EmpProjects[0];
         }
     }

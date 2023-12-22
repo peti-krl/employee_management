@@ -19,6 +19,7 @@ public class EmpController {
         this.empRepository = empRepository;
     }
 
+    // Reading from csv file provided as a request parameter and writing it to the database
     @PostMapping("/csv")
     public Iterable<EmpProjects> csvRead(@RequestParam("file") MultipartFile file) throws IOException {
         EmpProjects[] projects = readerCSV.read(file.getInputStream());
@@ -26,11 +27,13 @@ public class EmpController {
         return this.empRepository.saveAll(empProjectsList);
     }
 
+    // Read all records
     @GetMapping("/employees")
     public Iterable<EmpProjects> findAllEmp(){
         return this.empRepository.findAll();
     }
 
+    // Add record
     @PostMapping("/project")
     public EmpProjects addEmployee(@RequestBody EmpProjects empProjects){
         return this.empRepository.save(empProjects);
