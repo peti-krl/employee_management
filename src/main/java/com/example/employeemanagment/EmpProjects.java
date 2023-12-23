@@ -4,7 +4,10 @@ import jakarta.persistence.*;
 import jakarta.persistence.criteria.CriteriaBuilder;
 
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeFormatterBuilder;
 import java.util.Date;
+import java.util.Objects;
 
 
 @Entity
@@ -20,11 +23,11 @@ public class EmpProjects {
 
     public EmpProjects() {}
 
-    public EmpProjects(int empID, int projectID, LocalDate dateFrom, LocalDate dateTo){
+    public EmpProjects(int empID, int projectID, String dateFrom, String dateTo){
         this.empID = empID;
         this.projectID = projectID;
-        this.dateFrom = dateFrom;
-        this.dateTo = dateTo;
+        this.setDateFrom(dateFrom);
+        this.setDateTo(dateTo);
     }
     public int getEmpID() {
         return empID;
@@ -46,15 +49,21 @@ public class EmpProjects {
         return dateFrom;
     }
 
-    public void setDateFrom(LocalDate dateFrom) {
-        this.dateFrom = dateFrom;
+    public void setDateFrom(String dateFrom) {
+        DateTimeFormatter dfs = new DateTimeFormatterBuilder().appendOptional(DateTimeFormatter.ofPattern("dd-MM-yyyy")).appendOptional(DateTimeFormatter.ofPattern("yyyy/MM/dd")).appendOptional(DateTimeFormatter.ofPattern("dd/MM/yyyy")).appendOptional(DateTimeFormatter.ofPattern("yyyy-MM-dd")).toFormatter();
+        this.dateFrom = LocalDate.parse(dateFrom,dfs);
     }
 
     public LocalDate getDateTo() {
         return dateTo;
     }
 
-    public void setDateTo(LocalDate dateTo) {
-        this.dateTo = dateTo;
+    public void setDateTo(String dateTo) {
+        DateTimeFormatter dfs = new DateTimeFormatterBuilder().appendOptional(DateTimeFormatter.ofPattern("dd-MM-yyyy")).appendOptional(DateTimeFormatter.ofPattern("yyyy/MM/dd")).appendOptional(DateTimeFormatter.ofPattern("dd/MM/yyyy")).appendOptional(DateTimeFormatter.ofPattern("yyyy-MM-dd")).toFormatter();
+        if(Objects.equals(dateTo, "NULL")){
+            this.dateTo = null;
+        }else{
+            this.dateTo = LocalDate.parse(dateTo,dfs);
+        }
     }
 }

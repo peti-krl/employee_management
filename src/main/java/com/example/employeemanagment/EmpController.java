@@ -8,6 +8,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.time.Duration;
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 
 @RestController
@@ -46,6 +47,12 @@ public class EmpController {
         return empProjectsList;
     }
 
+    // Delete all records
+    @DeleteMapping("/delete")
+    public void deleteAll(){
+        this.empRepository.deleteAll();
+    }
+
     // Delete employee by id
     @DeleteMapping("/deleteemployee/{id}")
     public void deleteEmployeeById(@PathVariable("id") int id){
@@ -68,11 +75,12 @@ public class EmpController {
     @PostMapping("/updateemployee")
     public EmpProjects updateEmployeeById(@RequestBody EmpProjects newEmpProjects){
         Iterable<EmpProjects> empProjects = this.empRepository.findAll();
+
         for(EmpProjects item: empProjects){
             if(newEmpProjects.getEmpID() == item.getEmpID() && newEmpProjects.getProjectID() == item.getProjectID())
             {
-                item.setDateFrom(newEmpProjects.getDateFrom());
-                item.setDateTo(newEmpProjects.getDateTo());
+                item.setDateFrom(newEmpProjects.getDateFrom().toString());
+                item.setDateTo(newEmpProjects.getDateTo().toString());
                 return this.empRepository.save(item);
             }
         }
@@ -84,67 +92,71 @@ public class EmpController {
     // of time and the time for each of those projects
     @GetMapping("/besties")
     public String getCommonProjects(){
-        Iterable<EmpProjects> empProjects = this.empRepository.findAllOrderedByEmpId();
-        HashMap<String, Long> result = new HashMap<String, Long>();
+        try {
+            Iterable<EmpProjects> empProjects = this.empRepository.findAllOrderedByEmpId();
+            HashMap<String, Long> result = new HashMap<String, Long>();
 
-        for(EmpProjects project1 : empProjects){
-            for(EmpProjects project2 : empProjects){
-                if(project2.getEmpID() > project1.getEmpID() && project2.getProjectID() == project1.getProjectID()){
-                    if(project2.getDateTo() == null){
-                        project2.setDateTo(LocalDate.now());
-                    }
-                    if(project1.getDateTo() == null){
-                        project1.setDateTo(LocalDate.now());
-                    }
-                    LocalDate overlapStart = project1.getDateFrom().compareTo(project2.getDateFrom()) > 0 ?
-                            project1.getDateFrom() : project2.getDateFrom();
-
-                    LocalDate overlapEnd = project1.getDateTo().compareTo(project2.getDateTo()) < 0 ?
-                            project1.getDateTo() : project2.getDateTo();
-
-                    String key = String.valueOf(project1.getEmpID()) + ", " + String.valueOf(project2.getEmpID());
-                    if (overlapStart.compareTo(overlapEnd) < 0){
-                        long days = Duration.between(overlapStart.atStartOfDay(), overlapEnd.atStartOfDay()).toDays();
-                        if(!result.containsKey(key)){
-                            result.put(key, (long)0);
+            for (EmpProjects project1 : empProjects) {
+                for (EmpProjects project2 : empProjects) {
+                    if (project2.getEmpID() > project1.getEmpID() && project2.getProjectID() == project1.getProjectID()) {
+                        if (project2.getDateTo() == null) {
+                            project2.setDateTo(LocalDate.now().toString());
                         }
-                        result.put(key, result.get(key) + days);
+                        if (project1.getDateTo() == null) {
+                            project1.setDateTo(LocalDate.now().toString());
+                        }
+                        LocalDate overlapStart = project1.getDateFrom().compareTo(project2.getDateFrom()) > 0 ?
+                                project1.getDateFrom() : project2.getDateFrom();
+
+                        LocalDate overlapEnd = project1.getDateTo().compareTo(project2.getDateTo()) < 0 ?
+                                project1.getDateTo() : project2.getDateTo();
+
+                        String key = String.valueOf(project1.getEmpID()) + ", " + String.valueOf(project2.getEmpID());
+                        if (overlapStart.compareTo(overlapEnd) < 0) {
+                            long days = Duration.between(overlapStart.atStartOfDay(), overlapEnd.atStartOfDay()).toDays();
+                            if (!result.containsKey(key)) {
+                                result.put(key, (long) 0);
+                            }
+                            result.put(key, result.get(key) + days);
+                        }
                     }
                 }
             }
-        }
-        String pair = "";
-        long maxDays = 0;
-        for (HashMap.Entry<String, Long> entry : result.entrySet()){
-            if(entry.getValue() > maxDays){
-                maxDays = entry.getValue();
-                pair = entry.getKey();
+            String pair = "";
+            long maxDays = 0;
+            for (HashMap.Entry<String, Long> entry : result.entrySet()) {
+                if (entry.getValue() > maxDays) {
+                    maxDays = entry.getValue();
+                    pair = entry.getKey();
+                }
             }
-        }
 
-        String[] arr = pair.split(", ");
-        int firstId = Integer.parseInt(arr[0]);
-        int secondId = Integer.parseInt(arr[1]);
+            String[] arr = pair.split(", ");
+            int firstId = Integer.parseInt(arr[0]);
+            int secondId = Integer.parseInt(arr[1]);
 
-        pair += ", " + String.valueOf(maxDays) + "\n";
+            pair += ", " + String.valueOf(maxDays) + "\n";
 
-        for(EmpProjects project1 : empProjects) {
-            for (EmpProjects project2 : empProjects) {
-                if (project1.getEmpID() == firstId && project2.getEmpID() == secondId && project1.getProjectID() == project2.getProjectID()) {
-                    LocalDate overlapStart = project1.getDateFrom().compareTo(project2.getDateFrom()) > 0 ?
-                            project1.getDateFrom() : project2.getDateFrom();
+            for (EmpProjects project1 : empProjects) {
+                for (EmpProjects project2 : empProjects) {
+                    if (project1.getEmpID() == firstId && project2.getEmpID() == secondId && project1.getProjectID() == project2.getProjectID()) {
+                        LocalDate overlapStart = project1.getDateFrom().compareTo(project2.getDateFrom()) > 0 ?
+                                project1.getDateFrom() : project2.getDateFrom();
 
-                    LocalDate overlapEnd = project1.getDateTo().compareTo(project2.getDateTo()) < 0 ?
-                            project1.getDateTo() : project2.getDateTo();
+                        LocalDate overlapEnd = project1.getDateTo().compareTo(project2.getDateTo()) < 0 ?
+                                project1.getDateTo() : project2.getDateTo();
 
-                    String key = String.valueOf(project1.getEmpID()) + " " + String.valueOf(project2.getEmpID());
-                    if (overlapStart.compareTo(overlapEnd) < 0) {
-                        long days = Duration.between(overlapStart.atStartOfDay(), overlapEnd.atStartOfDay()).toDays();
-                        pair += String.valueOf(project1.getProjectID()) + ", " + String.valueOf(days) + "\n";
+                        String key = String.valueOf(project1.getEmpID()) + " " + String.valueOf(project2.getEmpID());
+                        if (overlapStart.compareTo(overlapEnd) < 0) {
+                            long days = Duration.between(overlapStart.atStartOfDay(), overlapEnd.atStartOfDay()).toDays();
+                            pair += String.valueOf(project1.getProjectID()) + ", " + String.valueOf(days) + "\n";
+                        }
                     }
                 }
             }
+            return pair;
+        }catch (Exception e){
+            return "-1";
         }
-        return pair;
     }
 }

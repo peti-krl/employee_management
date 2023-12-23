@@ -13,6 +13,7 @@ import java.io.FileReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -32,17 +33,10 @@ public class ReaderCSV implements IReader{
             for (CSVRecord csvRecord : csvRecords) {
                 int empId = Integer.parseInt(csvRecord.get(0));
                 int projectId = Integer.parseInt(csvRecord.get(1));
-                LocalDate dateFrom = LocalDate.parse(csvRecord.get(2));
-                LocalDate dateTo;
-                String dateToStr = csvRecord.get(3);
 
-                if(Objects.equals(dateToStr, "NULL")){
-                    dateTo = null;
-                }else {
-                    dateTo = LocalDate.parse(csvRecord.get(3));
-                }
 
-                EmpProjects project = new EmpProjects(empId, projectId, dateFrom, dateTo);
+
+                EmpProjects project = new EmpProjects(empId, projectId, csvRecord.get(2), csvRecord.get(3));
                 projects.add(project);
             }
 
