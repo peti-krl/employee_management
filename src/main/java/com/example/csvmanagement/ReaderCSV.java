@@ -51,6 +51,7 @@ public class ReaderCSV implements IReader{
             return arr;
 
         } catch (Exception e) {
+           e.printStackTrace();
             return new EmpProjects[0];
         }
     }
