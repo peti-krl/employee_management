@@ -48,13 +48,13 @@ public class EmpController {
     }
 
     // Delete all records
-    @DeleteMapping("/delete")
+    @DeleteMapping("/employees/delete")
     public void deleteAll(){
         this.empRepository.deleteAll();
     }
 
     // Delete employee by id
-    @DeleteMapping("/deleteemployee/{id}")
+    @DeleteMapping("/employees/delete/{id}")
     public void deleteEmployeeById(@PathVariable("id") int id){
         Iterable<EmpProjects> empProjects = this.empRepository.findAll();
         for (EmpProjects item : empProjects){
@@ -66,13 +66,13 @@ public class EmpController {
     }
 
     // Add record
-    @PostMapping("/project")
+    @PostMapping("/employees")
     public EmpProjects addEmployee(@RequestBody EmpProjects empProjects){
         return this.empRepository.save(empProjects);
     }
 
     // Update employee
-    @PostMapping("/updateemployee")
+    @PostMapping("/employees/update")
     public EmpProjects updateEmployeeById(@RequestBody EmpProjects newEmpProjects){
         Iterable<EmpProjects> empProjects = this.empRepository.findAll();
 
@@ -90,7 +90,7 @@ public class EmpController {
     // Identifies the pair of employees who
     // have worked together on common projects for the longest period
     // of time and the time for each of those projects
-    @GetMapping("/besties")
+    @GetMapping("/employees/besties")
     public String getCommonProjects(){
         try {
             Iterable<EmpProjects> empProjects = this.empRepository.findAllOrderedByEmpId();
