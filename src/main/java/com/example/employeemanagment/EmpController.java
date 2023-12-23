@@ -102,7 +102,7 @@ public class EmpController {
                     LocalDate overlapEnd = project1.getDateTo().compareTo(project2.getDateTo()) < 0 ?
                             project1.getDateTo() : project2.getDateTo();
 
-                    String key = String.valueOf(project1.getEmpID()) + " " + String.valueOf(project2.getEmpID());
+                    String key = String.valueOf(project1.getEmpID()) + ", " + String.valueOf(project2.getEmpID());
                     if (overlapStart.compareTo(overlapEnd) < 0){
                         long days = Duration.between(overlapStart.atStartOfDay(), overlapEnd.atStartOfDay()).toDays();
                         if(!result.containsKey(key)){
@@ -122,11 +122,11 @@ public class EmpController {
             }
         }
 
-        String[] arr = pair.split("\\s+");
+        String[] arr = pair.split(", ");
         int firstId = Integer.parseInt(arr[0]);
         int secondId = Integer.parseInt(arr[1]);
 
-        pair += " " + String.valueOf(maxDays) + "\n";
+        pair += ", " + String.valueOf(maxDays) + "\n";
 
         for(EmpProjects project1 : empProjects) {
             for (EmpProjects project2 : empProjects) {
@@ -140,7 +140,7 @@ public class EmpController {
                     String key = String.valueOf(project1.getEmpID()) + " " + String.valueOf(project2.getEmpID());
                     if (overlapStart.compareTo(overlapEnd) < 0) {
                         long days = Duration.between(overlapStart.atStartOfDay(), overlapEnd.atStartOfDay()).toDays();
-                        pair += String.valueOf(project1.getProjectID()) + " " + String.valueOf(days) + "\n";
+                        pair += String.valueOf(project1.getProjectID()) + ", " + String.valueOf(days) + "\n";
                     }
                 }
             }
